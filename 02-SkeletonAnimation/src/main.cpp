@@ -80,6 +80,11 @@ Model modelDartLegoLeftHand;
 Model modelDartLegoRightHand;
 Model modelDartLegoLeftLeg;
 Model modelDartLegoRightLeg;
+
+
+//Model Noctis
+Model modelNoctis;
+int NoctisAnimIndex = 0;
 // Model animate instance
 // Mayow
 Model mayowModelAnimate;
@@ -95,12 +100,12 @@ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 
-std::string fileNames[6] = { "../Textures/mp_bloodvalley/blood-valley_ft.tga",
-		"../Textures/mp_bloodvalley/blood-valley_bk.tga",
-		"../Textures/mp_bloodvalley/blood-valley_up.tga",
-		"../Textures/mp_bloodvalley/blood-valley_dn.tga",
-		"../Textures/mp_bloodvalley/blood-valley_rt.tga",
-		"../Textures/mp_bloodvalley/blood-valley_lf.tga" };
+std::string fileNames[6] = { "../Textures/Skybox/front.png",
+		"../Textures/Skybox/back.png",
+		"../Textures/Skybox/top.png",
+		"../Textures/Skybox/bottom.png",
+		"../Textures/Skybox/left.png",
+		"../Textures/Skybox/right.png" };
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -114,6 +119,8 @@ glm::mat4 modelMatrixLambo = glm::mat4(1.0);
 glm::mat4 modelMatrixAircraft = glm::mat4(1.0);
 glm::mat4 modelMatrixDart = glm::mat4(1.0f);
 glm::mat4 modelMatrixMayow = glm::mat4(1.0f);
+
+glm::mat4 modelMatrixNoctis = glm::mat4(1.0f);
 
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 int modelSelected = 0;
@@ -287,6 +294,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelDartLegoLeftLeg.setShader(&shaderMulLighting);
 	modelDartLegoRightLeg.loadModel("../models/LegoDart/LeoDart_right_leg.obj");
 	modelDartLegoRightLeg.setShader(&shaderMulLighting);
+
+	//Noctis
+	modelNoctis.loadModel("../models/Noctis/Noctis.fbx");
+	modelNoctis.setShader(&shaderMulLighting);
 
 	//Mayow
 	mayowModelAnimate.loadModel("../models/mayow/personaje2.fbx");
@@ -526,7 +537,7 @@ void destroy() {
 	modelLamboRearRightWheel.destroy();
 	modelLamboRightDor.destroy();
 	modelRock.destroy();
-
+	modelNoctis.destroy();
 	// Custom objects animate
 	mayowModelAnimate.destroy();
 
@@ -601,6 +612,28 @@ bool processInput(bool continueApplication) {
 		camera->mouseMoveCamera(offsetX, offsetY, deltaTime);
 	offsetX = 0;
 	offsetY = 0;
+
+	//Noctis Movement 
+	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+		modelMatrixNoctis = glm::translate(modelMatrixNoctis, glm::vec3(0.02, 0, 0));
+		NoctisAnimIndex = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		modelMatrixNoctis = glm::translate(modelMatrixNoctis, glm::vec3(-0.02, 0, 0));
+		NoctisAnimIndex = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_UP)) {
+		modelMatrixNoctis = glm::translate(modelMatrixNoctis, glm::vec3(0, 0, 0.02));
+		NoctisAnimIndex = 1;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+		modelMatrixNoctis = glm::translate(modelMatrixNoctis, glm::vec3(0, 0,- 0.02));
+		NoctisAnimIndex = 1;
+	}
+	else {
+		NoctisAnimIndex = 0;
+	}
+
 
 	// Seleccionar modelo
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS){
@@ -990,6 +1023,12 @@ void applicationLoop() {
 		modelDartLegoRightLeg.render(modelMatrixDartRightLeg);
 		// Se regresa el cull faces IMPORTANTE para la capa
 		glEnable(GL_CULL_FACE);
+		//Noctis
+		glm::mat4 modelMatrixNoctisFull = glm::mat4(modelMatrixNoctis);
+		modelMatrixNoctisFull = glm::translate(modelMatrixNoctisFull, glm::vec3(1, 0, 0));
+		modelMatrixNoctisFull = glm::scale(modelMatrixNoctisFull, glm::vec3(0.0005f, 0.0005f, 0.0005f));
+		modelNoctis.setAnimationIndex(NoctisAnimIndex);
+		modelNoctis.render(modelMatrixNoctisFull);
 
 		/*******************************************
 		 * Custom Anim objects obj
